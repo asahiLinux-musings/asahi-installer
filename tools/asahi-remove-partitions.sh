@@ -217,7 +217,7 @@ function remove_asahi_non_apfs_gpt_partitions() {
 	printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
 	local partition
 	for partition in "${non_apfs_partitions[@]}"; do
-		echo "removing: ${partition} with 'diskutil eraseVolume free free ${}partition}'"
+		echo "removing: ${partition} with 'diskutil eraseVolume free free ${partition}'"
 		diskutil eraseVolume free free "${partition}"
 	done
 }
@@ -273,7 +273,7 @@ function asahi_linux_cleaner_privileged() {
 	  abort_with_error 'Could not verify previous asahi installation' $?
 
 	printf 'Verified assumptions needed and commencing cleanup\n'
-	abort_with_error 'Test mode -- aborting before cleanup' 0
+# 	abort_with_error 'Test mode -- aborting before cleanup' 0
 
 	remove_asahi_partitions ||
 	  abort_with_error 'Could not remove the asahi partitions' $?

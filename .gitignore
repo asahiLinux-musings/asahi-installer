@@ -1,6 +1,8 @@
 __pycache__
 dl
 package
+.package
+releases
 *.tar.gz
 latest
 *.ipsw
