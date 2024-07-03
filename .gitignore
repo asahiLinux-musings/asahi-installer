@@ -7,5 +7,8 @@ latest
 *.egg-info
 build
 dist
-releases/*
+releases/**
+
+# ignore ide project data
+.idea
 
