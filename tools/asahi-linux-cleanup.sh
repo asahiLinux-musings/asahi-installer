@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck shell=bash3.2
+# shellcheck shell=bash
 #
 # clean up an installation of Asahi Linux by:
 # 1. removing all partitions created by the Asahi Linux installer, and
@@ -48,10 +48,10 @@ declare -rx OUTER_SCRIPT="${OUTER_SCRIPT:-${0}}"
 #
 
 function abort_with_error() {
-	local -r error_message="${1}"
-	local -r error_code="${2}"
-	printf '%s failed with status: %s errno=%d\n' "${OUTER_SCRIPT}" "${error_message}" "${error_code}" > /dev/stderr
-	exit 1
+  local -r error_message="${1}"
+  local -r error_code="${2}"
+  printf '%s failed with status: %s errno=%d\n' "${OUTER_SCRIPT}" "${error_message}" "${error_code}" > /dev/stderr
+  exit 1
 }
 
 #
@@ -60,15 +60,15 @@ function abort_with_error() {
 #
 
 function expected_physical_disk_count() {
-	printf '1'
+  printf '1'
 }
 
 function expected_apfs_partition_count() {
-	printf '4'
+  printf '4'
 }
 
 function expected_non_apfs_partition_count() {
-	printf '3'
+  printf '3'
 }
 
 function verify_cleaner_prerequisites() {
@@ -79,13 +79,13 @@ function verify_cleaner_prerequisites() {
     command -v bless
     command -v df
     command -v reboot
-	} || abort_with_error 'Failed to verify cleaner prerequisites' $?
+  } || abort_with_error 'Failed to verify cleaner prerequisites' $?
 }
 
 function install_prerequisites() {
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	eval "$(/opt/homebrew/bin/brew shellenv)"
-	brew install jq
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  brew install jq
 }
 
 function pl2json() {
@@ -93,37 +93,37 @@ function pl2json() {
 }
 
 function find_physical_internal_objects_as_json() {
-	diskutil list -plist physical internal | pl2json
+  diskutil list -plist physical internal | pl2json
 }
 
 function get_partition_info() {
-	local -r targetPartition="${1}"
-	diskutil info -plist "${targetPartition}" | pl2json
+  local -r targetPartition="${1}"
+  diskutil info -plist "${targetPartition}" | pl2json
 }
 
 function get_partition_container_reference() {
-	local -r targetPartition="${1}"
-	get_partition_info "${targetPartition}" | jq -r '.APFSContainerReference'
+  local -r targetPartition="${1}"
+  get_partition_info "${targetPartition}" | jq -r '.APFSContainerReference'
 }
 
 function filter_whole_disks() {
-	jq -r '.WholeDisks[]' | sort
+  jq -r '.WholeDisks[]' | sort
 }
 
 function jq_get_all_partitions_for_disk() {
-cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .AllDisksAndPartitions
   | map(select(.DeviceIdentifier == $devID))
 JQSCRIPT
 }
 
 function get_all_partitions_for_disk() {
-	local -r desiredDeviceIdentifier="${1}"
-	jq -r --arg devID "${desiredDeviceIdentifier}" "$(jq_get_all_partitions_for_disk)" | sort
+  local -r desiredDeviceIdentifier="${1}"
+  jq -r --arg devID "${desiredDeviceIdentifier}" "$(jq_get_all_partitions_for_disk)" | sort
 }
 
 function jq_filter_select_non_apfs_partitions() {
-cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .[].Partitions
   | map(select(.Content
   | test("^Apple_APFS")| not)).[]
@@ -132,16 +132,16 @@ JQSCRIPT
 }
 
 function filter_select_non_apfs_partitions() {
-	jq -r "$(jq_filter_select_non_apfs_partitions)"
+  jq -r "$(jq_filter_select_non_apfs_partitions)"
 }
 
 function get_non_apfs_partitions_for_disk() {
-	local -r desiredDeviceIdentifier="${1}"
-	get_all_partitions_for_disk "${desiredDeviceIdentifier}" | filter_select_non_apfs_partitions
+  local -r desiredDeviceIdentifier="${1}"
+  get_all_partitions_for_disk "${desiredDeviceIdentifier}" | filter_select_non_apfs_partitions
 }
 
 function jq_filter_select_apfs_partitions() {
-cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .[].Partitions
   | map(select(.Content
   | test("^Apple_APFS"))).[]
@@ -149,67 +149,67 @@ cat <<'JQSCRIPT'
 JQSCRIPT
 }
 function filter_select_apfs_partitions() {
-	jq -r "$(jq_filter_select_apfs_partitions)"
+  jq -r "$(jq_filter_select_apfs_partitions)"
 }
 
 function get_apfs_partitions_for_disk() {
-	local -r desiredDeviceIdentifier="${1}"
-	get_all_partitions_for_disk "${desiredDeviceIdentifier}" | filter_select_apfs_partitions
+  local -r desiredDeviceIdentifier="${1}"
+  get_all_partitions_for_disk "${desiredDeviceIdentifier}" | filter_select_apfs_partitions
 }
 
 function find_physical_internal_whole_disks() {
-	find_physical_internal_objects_as_json | filter_whole_disks
+  find_physical_internal_objects_as_json | filter_whole_disks
 }
 
 function verify_physical_internal_whole_disk() {
   local physical_internal_whole_disks
-	# returns DeviceIdentifier of internal drive if one drive in system
-	IFS=$'\n' read -r -d '' -a physical_internal_whole_disks <<< "$(find_physical_internal_whole_disks)"
-	printf '%s\n' "${physical_internal_whole_disks[@]}" 1>&2
-	printf '%s' "${physical_internal_whole_disks[0]}"
-	local -r count_internal_whole_disks="${#physical_internal_whole_disks[@]}"
-	[[ ${count_internal_whole_disks} = $(expected_physical_disk_count) ]] ||
-	  abort_with_error 'incorrect number of whole disks' $?
+  # returns DeviceIdentifier of internal drive if one drive in system
+  IFS=$'\n' read -r -d '' -a physical_internal_whole_disks <<< "$(find_physical_internal_whole_disks)"
+  printf '%s\n' "${physical_internal_whole_disks[@]}" 1>&2
+  printf '%s' "${physical_internal_whole_disks[0]}"
+  local -r count_internal_whole_disks="${#physical_internal_whole_disks[@]}"
+  [[ ${count_internal_whole_disks} = $(expected_physical_disk_count) ]] ||
+    abort_with_error 'incorrect number of whole disks' "$(false)"
 }
 
 function find_non_apfs_gpt_partitions() {
-	local -r desiredDeviceIdentifier="${1}"
-	find_physical_internal_objects_as_json | get_non_apfs_partitions_for_disk "${desiredDeviceIdentifier}"
+  local -r desiredDeviceIdentifier="${1}"
+  find_physical_internal_objects_as_json | get_non_apfs_partitions_for_disk "${desiredDeviceIdentifier}"
 }
 
 function verify_non_apfs_gpt_partitions() {
-	local -r physical_disk="${1}"
-	IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}" )"
-	printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
-	local -r count_non_apfs_partitions="${#non_apfs_partitions[@]}"
-	[[ ${count_non_apfs_partitions} = $(expected_non_apfs_partition_count) ]] ||
-	  abort_with_error 'incorrect number of non-APFS partitions' $?
-	printf 'Verified [%d] non-apfs partitions\n' "${count_non_apfs_partitions}"
+  local -r physical_disk="${1}"
+  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}")"
+  printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
+  local -r count_non_apfs_partitions="${#non_apfs_partitions[@]}"
+  [[ ${count_non_apfs_partitions} = $(expected_non_apfs_partition_count) ]] ||
+    abort_with_error 'incorrect number of non-APFS partitions' "$(false)"
+  printf 'Verified [%d] non-apfs partitions\n' "${count_non_apfs_partitions}"
 }
 
 function find_apfs_gpt_partitions() {
-	local -r desiredDeviceIdentifier="${1}"
-	find_physical_internal_objects_as_json | get_apfs_partitions_for_disk "${desiredDeviceIdentifier}"
+  local -r desiredDeviceIdentifier="${1}"
+  find_physical_internal_objects_as_json | get_apfs_partitions_for_disk "${desiredDeviceIdentifier}"
 }
 
 function verify_asahi_apfs_partition() {
-	local -r asahiPartition="${1}"
-	get_partition_container_reference "${asahiPartition}"
-	# false	
+  local -r asahiPartition="${1}"
+  get_partition_container_reference "${asahiPartition}"
+  # false
 }
 
 function verify_apfs_gpt_partition() {
-	local -r physical_disk="${1}"
-	IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}" )"
-	printf '%s \n' "${apfs_partitions[@]}" 1>&2
-	local -r count_apfs_partitions="${#apfs_partitions[@]}"
-	[[ ${count_apfs_partitions} = $(expected_apfs_partition_count) ]] ||
-	  abort_with_error 'incorrect number of APFS partitions' $?
-	printf 'Verified [%d] apfs partitions\n' "${count_apfs_partitions}"
-	asahi_apfs_partition="${apfs_partitions[2]}"
-	verify_asahi_apfs_partition "${asahi_apfs_partition}" ||
-	  abort_with_error 'unable to verify contents of asahi partition' $?
-	printf 'Verified [%s] asahi apfs partition\n' "${asahi_apfs_partition}"
+  local -r physical_disk="${1}"
+  IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}")"
+  printf '%s \n' "${apfs_partitions[@]}" 1>&2
+  local -r count_apfs_partitions="${#apfs_partitions[@]}"
+  [[ ${count_apfs_partitions} = $(expected_apfs_partition_count) ]] ||
+    abort_with_error 'incorrect number of APFS partitions' "$(false)"
+  printf 'Verified [%d] apfs partitions\n' "${count_apfs_partitions}"
+  asahi_apfs_partition="${apfs_partitions[2]}"
+  verify_asahi_apfs_partition "${asahi_apfs_partition}" ||
+    abort_with_error 'unable to verify contents of asahi partition' $?
+  printf 'Verified [%s] asahi apfs partition\n' "${asahi_apfs_partition}"
 }
 
 function verify_asahi_partition_assumptions() {
@@ -222,34 +222,34 @@ function verify_asahi_partition_assumptions() {
 }
 
 function remove_asahi_non_apfs_gpt_partitions() {
-	local -r physical_disk="${1}"
-	IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}" )"
-	printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
-	local partition
-	for partition in "${non_apfs_partitions[@]}"; do
-		echo "removing: ${partition} with 'diskutil eraseVolume free free ${partition}'"
-		diskutil eraseVolume free free "${partition}"
-	done
+  local -r physical_disk="${1}"
+  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}")"
+  printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
+  local partition
+  for partition in "${non_apfs_partitions[@]}"; do
+    echo "removing: ${partition} with 'diskutil eraseVolume free free ${partition}'"
+    diskutil eraseVolume free free "${partition}"
+  done
 }
 
 function remove_asahi_apfs_partition() {
-	local -r target_partition="${1}"
-	echo "removing: asahi apfs partition [${target_partition}] with [diskutil apfs deleteContainer ${asahi_apfs_partition}]"
-	diskutil apfs deleteContainer "${target_partition}"
+  local -r target_partition="${1}"
+  echo "removing: asahi apfs partition [${target_partition}] with [diskutil apfs deleteContainer ${asahi_apfs_partition}]"
+  diskutil apfs deleteContainer "${target_partition}"
 }
 
 function resize_apfs_partition() {
-	local -r target_partition="${1}"
-	echo "resizing: partition [${target_partition}] with [diskutil apfs resizeContainer ${target_partition} 0]"
-	diskutil apfs resizeContainer "${target_partition}" 0
+  local -r target_partition="${1}"
+  echo "resizing: partition [${target_partition}] with [diskutil apfs resizeContainer ${target_partition} 0]"
+  diskutil apfs resizeContainer "${target_partition}" 0
 }
 
 function remove_asahi_apfs_gpt_partitions_and_resize_predecessor() {
-	local -r physical_disk="${1}"
-	IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}" )"
-	printf '%s \n' "${apfs_partitions[@]}" 1>&2
-	remove_asahi_apfs_partition "${apfs_partitions[2]}"
-	resize_apfs_partition "${apfs_partitions[1]}"
+  local -r physical_disk="${1}"
+  IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}")"
+  printf '%s \n' "${apfs_partitions[@]}" 1>&2
+  remove_asahi_apfs_partition "${apfs_partitions[2]}"
+  resize_apfs_partition "${apfs_partitions[1]}"
 }
 
 function remove_asahi_partitions() {
@@ -286,18 +286,18 @@ function warn_user() {
 function asahi_linux_cleaner_privileged() {
   local -r target_partition="${1}"
 
-	verify_cleaner_prerequisites "${target_partition}" 1>&2
-	verify_asahi_partition_assumptions "${target_partition}"
+  verify_cleaner_prerequisites "${target_partition}" 1>&2
+  verify_asahi_partition_assumptions "${target_partition}"
 
-	printf 'Verified assumptions needed and commencing cleanup\n'
+  printf 'Verified assumptions needed and commencing cleanup\n'
 
   # set subsequent boots to macOS
   #   this must be the first step after verification
   #   in order to recover from an incomplete cleanup
 
   start_with_macos
-	remove_asahi_partitions"${target_partition}"
-	reboot_after_cleanup
+  remove_asahi_partitions"${target_partition}"
+  reboot_after_cleanup
 }
 
 function asahi_linux_cleaner() {
