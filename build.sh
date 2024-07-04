@@ -96,7 +96,7 @@ else
   fi
   if [[ "$(uname -p)" == "i386" ]] ; then
     M1N1_FLAGS+=" TOOLCHAIN=/usr/local/bin/"
-  fiå
+  fi
   # Do it twice in case of build system shenanigans with versions
   make -C "$M1N1" ${M1N1_FLAGS} -j4
   make -C "$M1N1" ${M1N1_FLAGS} -j4
