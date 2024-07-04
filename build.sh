@@ -92,8 +92,11 @@ else
 
   M1N1_FLAGS="RELEASE=1 CHAINLOADING=1"
   if [[ "$(uname -p)" == "i386" ]] || [[ -n "${CI:-}" ]]  ; then
-    M1N1_FLAGS+="  USE_CLANG=0 ARCH=aarch64-elf- TOOLCHAIN=/usr/local/bin/"
+    M1N1_FLAGS+=" USE_CLANG=0 ARCH=aarch64-elf-"
   fi
+  if [[ "$(uname -p)" == "i386" ]] ; then
+    M1N1_FLAGS+=" TOOLCHAIN=/usr/local/bin/"
+  fiå
   # Do it twice in case of build system shenanigans with versions
   make -C "$M1N1" ${M1N1_FLAGS} -j4
   make -C "$M1N1" ${M1N1_FLAGS} -j4
