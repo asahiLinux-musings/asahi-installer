@@ -28,11 +28,7 @@ jobs:
 
       - name: Run Shfmt
         run: |
-<<<<<<< HEAD
-          shfmt -d -i 2 -ci -sr -kp . | tee shfmt-output.txt || true
-=======
           shfmt -d -i 2 -ci -sr -kp -s . | tee shfmt-output.txt || true
->>>>>>> 307-techguru
         continue-on-error: true
 
       - name: Upload Shfmt results
