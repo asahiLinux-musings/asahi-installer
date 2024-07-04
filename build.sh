@@ -122,8 +122,11 @@ echo "Extracting Python framework..."
 
 mkdir -p "$PACKAGE/Frameworks/Python.framework"
 
-7z x -so "$DL/$PYTHON_PKG" Python_Framework.pkg/Payload | zcat | \
-  (cd "$PACKAGE/Frameworks/Python.framework"; cpio -i)
+7z x -so "$DL/$PYTHON_PKG" Python_Framework.pkg/Payload | zcat |
+  ( 
+    cd "$PACKAGE/Frameworks/Python.framework"
+    cpio -i
+  )
 
 cd "$PACKAGE/Frameworks/Python.framework/Versions/Current"
 
