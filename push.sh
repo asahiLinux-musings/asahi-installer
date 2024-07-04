@@ -29,7 +29,7 @@ put() {
     --header "AccessKey: $SECRET" \
     --header "Content-Type: $2" \
     --header 'accept: application/json' \
-    --data-binary @$3 >/tmp/ret
+    --data-binary @$3 > /tmp/ret
   ret=$?
   cat /tmp/ret
   echo

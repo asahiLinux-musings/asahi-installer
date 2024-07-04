@@ -34,7 +34,7 @@ if [ "${macos_ver%%.*}" -lt 12 ]; then
   exit 1
 fi
 
-if ! arch -arm64 ls >/dev/null  2>/dev/null; then
+if ! arch -arm64 ls > /dev/null 2> /dev/null; then
   echo
   echo "Looks like this is an Intel Mac!"
   echo "Sorry, Asahi Linux only supports Apple Silicon machines."
@@ -51,5 +51,5 @@ if [ $(arch) != "arm64" ]; then
   exec arch -arm64 ./install.sh
 fi
 
-exec </dev/tty  >/dev/tty  2>/dev/tty
+exec < /dev/tty > /dev/tty 2> /dev/tty
 exec $python main.py "$@"

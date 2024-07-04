@@ -76,7 +76,7 @@ else
         ] | first | .annotations."sh.brew.bottle.digest"'
   )
 
-  curl -L -o "$LIBFFI_PKG" \
+  curl -s -L -o "$LIBFFI_PKG" \
     -H "Authorization: Bearer ${token}" \
     -H 'Accept: application/vnd.oci.image.index.v1+json' \
     "$LIBFFI_BASE_URI/sha256:$digest"
@@ -154,13 +154,13 @@ echo "Packaging installer..."
 
 cd "$PACKAGE"
 
-echo "$VER" >version.tag
+echo "$VER" > version.tag
 
 PKGFILE="$RELEASES/installer-$VER.tar.gz"
 LATEST="$RELEASES/latest"
 
 tar czf "$PKGFILE" .
-echo "$VER" >"$LATEST"
+echo "$VER" > "$LATEST"
 
 echo
 echo "Built package: $(basename "$PKGFILE")"

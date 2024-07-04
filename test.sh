@@ -16,7 +16,7 @@ make -C "m1n1" RELEASE=1 CHAINLOADING=1 -j4
 sudo rm -rf /tmp/asahi-install
 mkdir -p /tmp/asahi-install
 
-git describe --tags --always --dirty >/tmp/asahi-install/version.tag
+git describe --tags --always --dirty > /tmp/asahi-install/version.tag
 
 cd /tmp/asahi-install
 ln -sf "$base/src"/* .

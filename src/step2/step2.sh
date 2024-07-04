@@ -28,7 +28,7 @@ echo
 BOLD="$(printf '\033[1m')"
 RST="$(printf '\033[m')"
 
-bputil -d -v "$VGID" >/tmp/bp.txt
+bputil -d -v "$VGID" > /tmp/bp.txt
 
 if ! grep -q ': Paired' /tmp/bp.txt; then
   echo "Your system did not boot into the correct recoveryOS."

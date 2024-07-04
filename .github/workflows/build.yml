@@ -1,0 +1,27 @@
+---
+name: Static Analysis
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c \
+            "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/runner/.zprofile
+          eval "$(/opt/homebrew/bin/brew shellenv)"
+
+      - name: Local Tooling
+        run: bash ./tools/install-build-tools.sh
+
+      - name: Asahi Builder
+        run: bash ./build.sh

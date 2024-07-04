@@ -7,15 +7,15 @@ VERSION="Fedora Linux 40"
 TARGET_VERSION="Fedora Asahi Remix 40"
 PACKAGE_BASE="https://asahilinux-fedora.b-cdn.net/os/"
 
-curl -s https://fedora-asahi-remix.org/installer_data.json >/tmp/far.json
+curl -s https://fedora-asahi-remix.org/installer_data.json > /tmp/far.json
 
 BUILD=$(jq -r \
-  ".os_list[].name | select(. | test(\"$VERSION\")) | sub(\".*\\\\((?<i>.*)\\\\).*\"; \"\\(.i)\")" </tmp/far.json  |
+  ".os_list[].name | select(. | test(\"$VERSION\")) | sub(\".*\\\\((?<i>.*)\\\\).*\"; \"\\(.i)\")" < /tmp/far.json |
     sort -r | head -1)
 
 echo "Using build: $BUILD"
 
-jq <data/installer_data.json  >/tmp/new.json  --indent 4 --slurpfile far /tmp/far.json \
+jq < data/installer_data.json > /tmp/new.json --indent 4 --slurpfile far /tmp/far.json \
   ".os_list |=
     [
       \$far[0].os_list[]

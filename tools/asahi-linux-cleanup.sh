@@ -50,7 +50,7 @@ declare -rx OUTER_SCRIPT="${OUTER_SCRIPT:-${0}}"
 function abort_with_error() {
   local -r error_message="${1}"
   local -r error_code="${2}"
-  printf '%s failed with status: %s errno=%d\n' "${OUTER_SCRIPT}" "${error_message}" "${error_code}" >/dev/stderr
+  printf '%s failed with status: %s errno=%d\n' "${OUTER_SCRIPT}" "${error_message}" "${error_code}" > /dev/stderr
   exit 1
 }
 
@@ -111,7 +111,7 @@ function filter_whole_disks() {
 }
 
 function jq_get_all_partitions_for_disk() {
-  cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .AllDisksAndPartitions
   | map(select(.DeviceIdentifier == $devID))
 JQSCRIPT
@@ -123,7 +123,7 @@ function get_all_partitions_for_disk() {
 }
 
 function jq_filter_select_non_apfs_partitions() {
-  cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .[].Partitions
   | map(select(.Content
   | test("^Apple_APFS")| not)).[]
@@ -141,7 +141,7 @@ function get_non_apfs_partitions_for_disk() {
 }
 
 function jq_filter_select_apfs_partitions() {
-  cat <<'JQSCRIPT'
+  cat << 'JQSCRIPT'
   .[].Partitions
   | map(select(.Content
   | test("^Apple_APFS"))).[]
@@ -164,7 +164,7 @@ function find_physical_internal_whole_disks() {
 function verify_physical_internal_whole_disk() {
   local physical_internal_whole_disks
   # returns DeviceIdentifier of internal drive if one drive in system
-  IFS=$'\n' read -r -d '' -a physical_internal_whole_disks <<<"$(find_physical_internal_whole_disks)"
+  IFS=$'\n' read -r -d '' -a physical_internal_whole_disks <<< "$(find_physical_internal_whole_disks)"
   printf '%s\n' "${physical_internal_whole_disks[@]}" 1>&2
   printf '%s' "${physical_internal_whole_disks[0]}"
   local -r count_internal_whole_disks="${#physical_internal_whole_disks[@]}"
@@ -179,7 +179,7 @@ function find_non_apfs_gpt_partitions() {
 
 function verify_non_apfs_gpt_partitions() {
   local -r physical_disk="${1}"
-  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<<"$(find_non_apfs_gpt_partitions "${physical_disk}")"
+  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}")"
   printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
   local -r count_non_apfs_partitions="${#non_apfs_partitions[@]}"
   [[ ${count_non_apfs_partitions} == $(expected_non_apfs_partition_count) ]] ||
@@ -200,7 +200,7 @@ function verify_asahi_apfs_partition() {
 
 function verify_apfs_gpt_partition() {
   local -r physical_disk="${1}"
-  IFS=$'\n' read -r -d '' -a apfs_partitions <<<"$(find_apfs_gpt_partitions "${physical_disk}")"
+  IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}")"
   printf '%s \n' "${apfs_partitions[@]}" 1>&2
   local -r count_apfs_partitions="${#apfs_partitions[@]}"
   [[ ${count_apfs_partitions} == $(expected_apfs_partition_count) ]] ||
@@ -223,7 +223,7 @@ function verify_asahi_partition_assumptions() {
 
 function remove_asahi_non_apfs_gpt_partitions() {
   local -r physical_disk="${1}"
-  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<<"$(find_non_apfs_gpt_partitions "${physical_disk}")"
+  IFS=$'\n' read -r -d '' -a non_apfs_partitions <<< "$(find_non_apfs_gpt_partitions "${physical_disk}")"
   printf '%s \n' "${non_apfs_partitions[@]}" 1>&2
   local partition
   for partition in "${non_apfs_partitions[@]}"; do
@@ -246,7 +246,7 @@ function resize_apfs_partition() {
 
 function remove_asahi_apfs_gpt_partitions_and_resize_predecessor() {
   local -r physical_disk="${1}"
-  IFS=$'\n' read -r -d '' -a apfs_partitions <<<"$(find_apfs_gpt_partitions "${physical_disk}")"
+  IFS=$'\n' read -r -d '' -a apfs_partitions <<< "$(find_apfs_gpt_partitions "${physical_disk}")"
   printf '%s \n' "${apfs_partitions[@]}" 1>&2
   remove_asahi_apfs_partition "${apfs_partitions[2]}"
   resize_apfs_partition "${apfs_partitions[1]}"

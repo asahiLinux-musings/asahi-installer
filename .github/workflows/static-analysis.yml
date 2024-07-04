@@ -1,3 +1,4 @@
+---
 name: Static Analysis
 
 on: [push, pull_request]
@@ -17,7 +18,10 @@ jobs:
 
       - name: Run ShellCheck
         run: |
-          find . -name "*.sh" -print0 | xargs -0 shellcheck --shell=bash | tee shellcheck-output.txt || true
+          find . -name "*.sh" -print0 |
+            xargs -0 shellcheck --shell=bash |
+            tee shellcheck-output.txt ||
+          true
         continue-on-error: true
 
       - name: Upload ShellCheck results
@@ -28,7 +32,7 @@ jobs:
 
       - name: Run Shfmt
         run: |
-          shfmt -d -i 2 -ci -kp -s . | tee shfmt-output.txt || true
+          shfmt -d -i 2 -ci -kp -s -sr . | tee shfmt-output.txt
         continue-on-error: true
 
       - name: Upload Shfmt results
@@ -66,7 +70,7 @@ jobs:
 
       - name: Run Bandit
         run: |
-          bandit -r . -o bandit-output.txt -f txt || truefe
+          bandit -r . -o bandit-output.txt -f txt || true
         continue-on-error: true
 
       - name: Upload Bandit results
