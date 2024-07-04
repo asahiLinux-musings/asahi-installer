@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Shfmt
         run: |
-          shfmt -d -i 2 -ci -sr -kp -s . | tee shfmt-output.txt || true
+          shfmt -d -i 2 -ci -kp -s . | tee shfmt-output.txt || true
         continue-on-error: true
 
       - name: Upload Shfmt results
