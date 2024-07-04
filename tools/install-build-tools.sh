@@ -50,6 +50,8 @@ function install_gcc_arm64() {
   brew install arm-none-eabi-gcc
   if [[ "$(uname -p)" == "i386" ]]; then
     brew install aarch64-elf-gcc
+  else
+    brew install aarch-linux-gnu
   fi
 }
 
