@@ -90,9 +90,13 @@ elif [ ! -r "$M1N1/Makefile" ]; then
 else
   echo "Building m1n1..."
 
+  M1N1_FLAGS="RELEASE=1 CHAINLOADING=1 USE_CLANG=0"
+  if [[ "$(uname -p)" == "i386" ]]; then
+    M1N1_FLAGS+=" ARCH=aarch64-elf- TOOLCHAIN=/usr/local/bin/"
+  fi
   # Do it twice in case of build system shenanigans with versions
-  make -C "$M1N1" RELEASE=1 CHAINLOADING=1 -j4
-  make -C "$M1N1" RELEASE=1 CHAINLOADING=1 -j4
+  make -C "$M1N1" ${M1N1_FLAGS} -j4
+  make -C "$M1N1" ${M1N1_FLAGS} -j4
 
   M1N1_STAGE1="$M1N1/build/m1n1.bin"
 fi

@@ -44,6 +44,15 @@ function install_certifi() {
   brew install certifi
 }
 
+function install_gcc_arm64() {
+  brew install gcc
+  brew tap osx-cross/arm
+  brew install arm-none-eabi-gcc
+  if [[ "$(uname -p)" == "i386" ]]; then
+    brew install aarch64-elf-gcc
+  fi
+}
+
 function main() {
   if [ -z "$GITHUB_ACTIONS" ]; then
     install_homebrew
@@ -52,6 +61,7 @@ function main() {
   install_rust_for_apple_silicon
   install_7z
   install_certifi
+  install_gcc_arm64
 }
 
 #
