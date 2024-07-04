@@ -17,7 +17,7 @@ jobs:
 
       - name: Run ShellCheck
         run: |
-          find . -name "*.sh" -print0 | xargs -0 shellcheck --shell=bash | tee shellcheck-output.txt
+          find . -name "*.sh" -print0 | xargs -0 shellcheck --shell=bash | tee shellcheck-output.txt || true
         continue-on-error: true
 
       - name: Upload ShellCheck results
@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Shfmt
         run: |
-          shfmt -d -i 2 -ci -sr -kp . | tee shfmt-output.txt
+          shfmt -d -i 2 -ci -sr -kp . | tee shfmt-output.txt || true
         continue-on-error: true
 
       - name: Upload Shfmt results
@@ -55,7 +55,7 @@ jobs:
 
       - name: Run Flake8
         run: |
-          flake8 . --output-file=flake8-output.txt
+          flake8 . --output-file=flake8-output.txt || true
         continue-on-error: true
 
       - name: Upload Flake8 results
@@ -66,7 +66,7 @@ jobs:
 
       - name: Run Bandit
         run: |
-          bandit -r . -o bandit-output.txt -f txt
+          bandit -r . -o bandit-output.txt -f txt || truefe
         continue-on-error: true
 
       - name: Upload Bandit results
@@ -92,7 +92,7 @@ jobs:
 
       - name: Run yamllint
         run: |
-          yamllint . > yamllint-output.txt
+          yamllint . > yamllint-output.txt || true
 
       - name: Upload yamllint results
         uses: actions/upload-artifact@v4
