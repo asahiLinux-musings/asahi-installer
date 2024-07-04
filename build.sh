@@ -53,7 +53,16 @@ echo " - Python"
 if [ -e "$PYTHON_PKG" ]; then
   echo "Using existing $PYTHON_PKG"
 else
-  wget -Nc "$PYTHON_URI"
+  # Check if running in a non-interactive shell
+  if ! [ -t 1 ]; then
+    # Non-interactive shell, add the -q option to wget
+    WGET_OPTS="-q"
+  else
+    # Interactive shell, do not add the -q option
+    WGET_OPTS=""
+  fi
+
+  wget -Nc "$WGET_OPTS" "$PYTHON_URI"
 fi
 
 echo " - libffi"
@@ -93,9 +102,12 @@ else
   M1N1_FLAGS="RELEASE=1 CHAINLOADING=1"
   if [[ "$(uname -p)" == "i386" ]] || [[ -n "${CI:-}" ]]  ; then
     M1N1_FLAGS+=" USE_CLANG=0 ARCH=aarch64-elf-"
-  fi
-  if [[ "$(uname -p)" == "i386" ]] ; then
-    M1N1_FLAGS+=" TOOLCHAIN=/usr/local/bin/"
+    if [[ "$(uname -p)" == "i386" ]] ; then
+      M1N1_FLAGS+=" TOOLCHAIN=/usr/local/bin/"
+    fi
+    if [[ -n "${CI:-}" ]] ; then
+      M1N1_FLAGS+=" TOOLCHAIN=/opt/homebrew/bin/"
+    fi
   fi
   # Do it twice in case of build system shenanigans with versions
   make -C "$M1N1" ${M1N1_FLAGS} -j4
