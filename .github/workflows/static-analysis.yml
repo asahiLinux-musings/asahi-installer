@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout
 
       - name: Install ShellCheck
         run: sudo apt-get install -y shellcheck
@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload ShellCheck results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact
         with:
           name: shellcheck-results
           path: shellcheck-output.txt
@@ -32,7 +32,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Shfmt results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact
         with:
           name: shfmt-results
           path: shfmt-output.txt
@@ -41,10 +41,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python
         with:
           python-version: '3.x'
 
@@ -59,7 +59,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Flake8 results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact
         with:
           name: flake8-results
           path: flake8-output.txt
@@ -70,7 +70,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Bandit results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact
         with:
           name: bandit-results
           path: bandit-output.txt
@@ -79,10 +79,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python
         with:
           python-version: '3.x'
 
@@ -95,7 +95,7 @@ jobs:
           yamllint . > yamllint-output.txt
 
       - name: Upload yamllint results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact
         with:
           name: yamllint-results
           path: yamllint-output.txt
