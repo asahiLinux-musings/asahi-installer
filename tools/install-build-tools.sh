@@ -51,7 +51,7 @@ function install_gcc_arm64() {
   if [[ "$(uname -p)" == "i386" ]]; then
     brew install aarch64-elf-gcc
   else
-    brew install aarch-linux-gnu
+    brew install aarch-linux-gnu-gcc
   fi
 }
 
